@@ -777,12 +777,15 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
     Walk()
 })
 sprites.onOverlap(SpriteKind.Food, SpriteKind.Enemy, function (sprite, otherSprite) {
-    info.changeScoreBy(1)
     if (mySprite4 && mySprite4.x > 0) {
         statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -10
     } else {
-        statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -1
+        statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -5
     }
+})
+info.onCountdownEnd(function () {
+    game.splash("Congrats, you survived, you can make it back home now")
+    game.over(true, effects.confetti)
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
     status.spriteAttachedTo().destroy()
@@ -808,6 +811,7 @@ statusbars.onZero(StatusBarKind.Health, function (status) {
         mySprite3.x = status.spriteAttachedTo().x
         mySprite3.y = status.spriteAttachedTo().y
     }
+    info.changeScoreBy(1)
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     WhatDirection = 1
@@ -909,7 +913,7 @@ function Enemie () {
     )
     enemy_health = statusbars.create(12, 2, StatusBarKind.Health)
     enemy_health.attachToSprite(alien)
-    enemy_health.max = 100
+    enemy_health.max = 50
     enemy_health.setColor(9, 2)
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.powerup, function (sprite, otherSprite) {
@@ -946,6 +950,9 @@ let mySprite4: Sprite = null
 let WhatDirection = 0
 let mySprite2: Sprite = null
 let mySprite: Sprite = null
+game.splash("Your the last alive, and Aliens are trying to Attack You")
+game.splash("Use your Sword and Fight Back!")
+game.splash("Stay alive and head back to Earth")
 tiles.setTilemap(tilemap`level1`)
 mySprite = sprites.create(img`
     ..........ffff..........
@@ -995,7 +1002,8 @@ mySprite2 = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
     `, SpriteKind.Food)
-info.setLife(5)
+info.setLife(10)
+info.startCountdown(60)
 game.onUpdate(function () {
     if (WhatDirection == 0) {
         mySprite2.x = mySprite.x
@@ -1021,7 +1029,7 @@ game.onUpdateInterval(10000, function () {
     Enemie()
     alien.follow(mySprite, 10)
     alien.setPosition(randint(scene.screenWidth(), 0), randint(scene.screenHeight(), 0))
-    if (true) {
+    if (info.score() <= 10) {
         Enemie()
     }
 })
