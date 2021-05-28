@@ -1,3 +1,7 @@
+namespace SpriteKind {
+    export const powerup = SpriteKind.create()
+    export const pog = SpriteKind.create()
+}
 function Walk () {
     if (WhatDirection == 0) {
         animation.runImageAnimation(
@@ -774,10 +778,36 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 sprites.onOverlap(SpriteKind.Food, SpriteKind.Enemy, function (sprite, otherSprite) {
     info.changeScoreBy(1)
-    statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -1
+    if (mySprite4 && mySprite4.x > 0) {
+        statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -10
+    } else {
+        statusbars.getStatusBarAttachedTo(StatusBarKind.Health, otherSprite).value += -1
+    }
 })
 statusbars.onZero(StatusBarKind.Health, function (status) {
     status.spriteAttachedTo().destroy()
+    if (Math.percentChance(15)) {
+        mySprite3 = sprites.create(img`
+            . . . . . . 2 2 2 2 2 . . . . . 
+            . . . . . . 2 e e e 2 . . . . . 
+            . . . . . . 2 e 2 e 2 . . . . . 
+            . . . . . 5 2 e 2 e 2 5 . . . . 
+            . . . . 5 5 2 e 2 e 2 5 5 . . . 
+            2 2 2 2 2 2 5 e 2 e 5 2 2 2 2 2 
+            2 e e e e e e 5 2 5 e e e e e 2 
+            2 e 2 2 2 2 2 2 5 2 2 2 2 2 e 2 
+            2 e e e e e e 5 2 5 e e e e e 2 
+            2 2 2 2 2 2 5 e 2 e 5 2 2 2 2 2 
+            . . . . 5 5 2 e 2 e 2 5 5 . . . 
+            . . . . . 5 2 e 2 e 2 5 . . . . 
+            . . . . . . 2 e 2 e 2 . . . . . 
+            . . . . . . 2 e 2 e 2 . . . . . 
+            . . . . . . 2 e e e 2 . . . . . 
+            . . . . . . 2 2 2 2 2 . . . . . 
+            `, SpriteKind.powerup)
+        mySprite3.x = status.spriteAttachedTo().x
+        mySprite3.y = status.spriteAttachedTo().y
+    }
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     WhatDirection = 1
@@ -882,6 +912,28 @@ function Enemie () {
     enemy_health.max = 100
     enemy_health.setColor(9, 2)
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.powerup, function (sprite, otherSprite) {
+    mySprite4 = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.pog)
+    mySprite4.lifespan = 10000
+    otherSprite.destroy()
+})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
     info.changeLifeBy(-1)
     otherSprite.destroy()
@@ -889,6 +941,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSp
 let moving = false
 let enemy_health: StatusBarSprite = null
 let alien: Sprite = null
+let mySprite3: Sprite = null
+let mySprite4: Sprite = null
 let WhatDirection = 0
 let mySprite2: Sprite = null
 let mySprite: Sprite = null
@@ -941,6 +995,7 @@ mySprite2 = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . . . . . . . . . . . . . 
     `, SpriteKind.Food)
+info.setLife(5)
 game.onUpdate(function () {
     if (WhatDirection == 0) {
         mySprite2.x = mySprite.x
@@ -962,8 +1017,11 @@ game.onUpdate(function () {
         animation.stopAnimation(animation.AnimationTypes.All, mySprite)
     }
 })
-game.onUpdateInterval(5000, function () {
+game.onUpdateInterval(10000, function () {
     Enemie()
     alien.follow(mySprite, 10)
     alien.setPosition(randint(scene.screenWidth(), 0), randint(scene.screenHeight(), 0))
+    if (true) {
+        Enemie()
+    }
 })
